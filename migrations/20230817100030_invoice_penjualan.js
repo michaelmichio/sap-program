@@ -7,6 +7,7 @@ exports.up = function(knex) {
         table.increments("id").primary();
         table.string("nomor_invoice", 50).notNullable().unique();
         table.date("tanggal").notNullable();
+        table.enum("status", ["pending", "selesai", "batal"]);
         table.integer("id_customer").unsigned().references("id").inTable("customers").notNullable();
         table.string("jenis_kendaraan", 50).notNullable();
         table.string("nomor_polisi", 20).notNullable();

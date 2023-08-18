@@ -22,7 +22,7 @@ export const getServerSideProps = async (context) => {
 
 export default function Penjualan() {
     const [loading, setLoading] = useState(true);
-    const [orders, setOrders] = useState([]);
+    const [dataPenjualan, setDataPenjualan] = useState([]);
 
     useEffect(() => {
         // Fetch orders data here
@@ -56,13 +56,12 @@ export default function Penjualan() {
                             <table className="w-full">
                                 <thead>
                                     <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                        <th className="w-1/12 truncate ... px-4 py-3">No</th>
-                                        <th className="w-1/8 truncate ... px-4 py-3">ID Order</th>
-                                        <th className="w-1/8 truncate ... px-4 py-3">ID Customer</th>
-                                        <th className="w-1/8 truncate ... px-4 py-3">Nama Customer</th>
-                                        <th className="w-1/8 truncate ... px-4 py-3">Tanggal Order</th>
-                                        <th className="w-1/8 truncate ... px-4 py-3">Total Biaya</th>
-                                        <th className="w-1/8 truncate ... px-4 py-3">Status</th>
+                                        <th className="w-1/12 truncate ... px-4 py-3">No.</th>
+                                        <th className="w-1/4 truncate ... px-4 py-3">No. Invoice</th>
+                                        <th className="w-1/4 truncate ... px-4 py-3">Tanggal</th>
+                                        <th className="w-1/4 truncate ... px-4 py-3">Customer</th>
+                                        <th className="w-1/4 truncate ... px-4 py-3">Total Biaya</th>
+                                        <th className="w-1/4 truncate ... px-4 py-3">Status</th>
                                         <th className="truncate ... px-4 py-3"></th>
                                     </tr>
                                 </thead>
@@ -70,20 +69,19 @@ export default function Penjualan() {
                                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     {loading ? (
                                         <tr>
-                                            <td colSpan="8" className="text-center py-4">
+                                            <td colSpan="7" className="text-center py-4">
                                                 Loading...
                                             </td>
                                         </tr>
                                     ) : (
-                                        orders.map((order, index) => (
-                                            <tr key={index} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                                                <td className="w-1/12 truncate ... px-4 py-3 text-sm">{index + 1}</td>
-                                                <td className="w-1/8 truncate ... px-4 py-3 text-sm">{order.id}</td>
-                                                <td className="w-1/8 truncate ... px-4 py-3 text-sm">{order.customerId}</td>
-                                                <td className="w-1/8 truncate ... px-4 py-3 text-sm">{order.customerName}</td>
-                                                <td className="w-1/8 truncate ... px-4 py-3 text-sm">{order.orderDate}</td>
-                                                <td className="w-1/8 truncate ... px-4 py-3 text-sm">{order.totalCost}</td>
-                                                <td className="w-1/8 truncate ... px-4 py-3 text-xs">{order.status}</td>
+                                        dataPenjualan.map((penjualan) => (
+                                            <tr key={penjualan} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+                                                <td className="w-1/12 truncate ... px-4 py-3 text-sm">1</td>
+                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{penjualan.nomor_invoice}</td>
+                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{penjualan.tanggal}</td>
+                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{penjualan.nama_customer}</td>
+                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{penjualan.total_biaya}</td>
+                                                <td className="w-1/4 truncate ... px-4 py-3 text-xs">{penjualan.status}</td>
                                                 <td className="px-4 py-3 text-sm flex justify-end">
                                                     <button
                                                         type="button"

@@ -10,7 +10,7 @@ exports.up = function(knex) {
         table.string("email", 100).unique();
         table.string("phone", 20);
         table.date("birthdate");
-        table.enum("gender", ["male", "female", "other"]);
+        table.enum("gender", ["pria", "wanita", "lainnya"]);
         
         table.timestamps(true, true);
     });

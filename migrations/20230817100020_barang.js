@@ -8,6 +8,7 @@ exports.up = function(knex) {
         table.string("kode", 20).notNullable().unique();
         table.string("nama", 255).notNullable();
         table.decimal("harga_beli", 12, 2).notNullable(); // Decimal type for price with precision of 12 digits and 2 decimal places
+        table.decimal("harga_jual_terbaru", 12, 2).notNullable(); // Decimal type for price with precision of 12 digits and 2 decimal places
         table.decimal("jumlah", 10, 2).notNullable(); // Decimal type for quantity with precision of 10 digits and 2 decimal places
         table.enum("kategori", ["spare_part", "oli", "jasa", "tune_up", "balancing", "storing"]);
         table.integer("pembelian_id").unsigned().references("id").inTable("pembelian"); // Foreign key to pembelian.id
