@@ -20,7 +20,7 @@ export const getServerSideProps = async (context) => {
     };
 }
 
-export default function Customer() {
+export default function Stok() {
     return (
         <>
             <Navbar />
