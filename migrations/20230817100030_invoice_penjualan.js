@@ -8,7 +8,7 @@ exports.up = function(knex) {
         table.string("nomor_invoice", 50).notNullable().unique();
         table.date("tanggal").notNullable();
         table.enum("status", ["pending", "selesai", "batal"]);
-        table.integer("id_customer").unsigned().references("id").inTable("customers").notNullable();
+        table.integer("id_customer").unsigned().references("id").inTable("customers").notNullable().onDelete("RESTRICT");
         table.string("jenis_kendaraan", 50).notNullable();
         table.string("nomor_polisi", 20).notNullable();
         table.string("nomor_rangka", 50);

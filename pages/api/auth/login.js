@@ -5,7 +5,7 @@ import { JWT_PRIVATE_KEY } from "@/utils/constants";
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: "Method Not Allowed" });
+        return res.status(405).json({ error: "Method Not Allowed." });
     }
     
     const { username, password } = req.body;

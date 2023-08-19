@@ -25,8 +25,6 @@ export default function Stok() {
     const [dataStok, setDataStok] = useState([]);
 
     useEffect(() => {
-        // Fetch orders data here
-        // Set loading and orders state
         setLoading(false);
     }, []);
 
@@ -40,7 +38,7 @@ export default function Stok() {
                         <div className="box-wrapper">
                             <div className=" bg-white rounded flex items-center w-full p-3 shadow-sm border border-gray-200">
                                 <button className="outline-none focus:outline-none"><svg className=" w-5 text-gray-600 h-5 cursor-pointer" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-                                <input type="search" name="" id="" placeholder="search for orders" x-model="q" className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent" />
+                                <input type="search" name="" id="" placeholder="search" x-model="q" className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent" />
                             </div>
                         </div>
                     </div>
@@ -57,11 +55,11 @@ export default function Stok() {
                                 <thead>
                                     <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                         <th className="w-1/12 truncate ... px-4 py-3">No.</th>
-                                        <th className="w-1/4 truncate ... px-4 py-3">Kode Barang</th>
-                                        <th className="w-1/4 truncate ... px-4 py-3">Nama Barang</th>
-                                        <th className="w-1/4 truncate ... px-4 py-3">Jumlah Terjual</th>
-                                        <th className="w-1/4 truncate ... px-4 py-3">Sales</th>
-                                        <th className="w-1/4 truncate ... px-4 py-3">HPP</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">Kode Barang</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">Nama Barang</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">Jumlah Terjual</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">Sales</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">HPP</th>
                                         <th className="truncate ... px-4 py-3"></th>
                                     </tr>
                                 </thead>
@@ -77,11 +75,11 @@ export default function Stok() {
                                         dataStok.map((stok) => (
                                             <tr key={stok} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
                                                 <td className="w-1/12 truncate ... px-4 py-3 text-sm">1</td>
-                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{stok.nomor_invoice}</td>
-                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{stok.tanggal}</td>
-                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{stok.nama_customer}</td>
-                                                <td className="w-1/4 truncate ... px-4 py-3 text-sm">{stok.total_biaya}</td>
-                                                <td className="w-1/4 truncate ... px-4 py-3 text-xs">{stok.status}</td>
+                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.nomor_invoice}</td>
+                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.tanggal}</td>
+                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.nama_customer}</td>
+                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.total_biaya}</td>
+                                                <td className="w-1/6 truncate ... px-4 py-3 text-xs">{stok.status}</td>
                                                 <td className="px-4 py-3 text-sm flex justify-end">
                                                     <button
                                                         type="button"

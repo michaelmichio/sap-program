@@ -11,8 +11,7 @@ const MAX_NAME_LENGTH = 18;
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        res.status(405).end();
-        return;
+        return res.status(405).json({ error: "Method Not Allowed." });
     }
     
     const { username, password, name, adminkey } = req.body;
