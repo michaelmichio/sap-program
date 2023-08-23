@@ -189,7 +189,7 @@ export default function Customer(props) {
                 Birthdate: customer.birthdate,
                 Gender: customer.gender,
             }));
-            
+
             const workbook = await XlsxPopulate.fromBlankAsync();
             const worksheet = workbook.addSheet('Data Pelanggan');
 
@@ -342,13 +342,13 @@ export default function Customer(props) {
                     </div>
                     <div className="flex flex-col justify-center ml-4 mr-4">
                         <div className="flex flex-col justify-center ml-4 mr-4">
-                            <button
+                            {/* <button
                                 type="button"
                                 className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"
-                            // onClick={handleDownload}
+                                onClick={handleDownload}
                             >
                                 CETAK
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                     <ExcelExportHelper></ExcelExportHelper>

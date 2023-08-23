@@ -22,7 +22,7 @@ export const getServerSideProps = async (context) => {
 
 export default function Stok() {
     const [loading, setLoading] = useState(true);
-    const [dataStok, setDataStok] = useState([]);
+    const [dataPenjualan, setDataPenjualan] = useState([]);
 
     useEffect(() => {
         setLoading(false);
@@ -42,11 +42,6 @@ export default function Stok() {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col justify-center ml-4 mr-4">
-                        {/* <button type="button" className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded">
-                            Tambah
-                        </button> */}
-                    </div>
                 </div>
                 <div className="mt-2 mx-4">
                     <div className="w-full overflow-hidden rounded-lg shadow-xs">
@@ -57,8 +52,9 @@ export default function Stok() {
                                         <th className="w-1/12 truncate ... px-4 py-3">No.</th>
                                         <th className="w-1/6 truncate ... px-4 py-3">Kode Barang</th>
                                         <th className="w-1/6 truncate ... px-4 py-3">Nama Barang</th>
-                                        <th className="w-1/6 truncate ... px-4 py-3">Jumlah Terjual</th>
-                                        <th className="w-1/6 truncate ... px-4 py-3">Sales</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">Harga Beli</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">Harga Jual</th>
+                                        <th className="w-1/6 truncate ... px-4 py-3">Jumlah terjual</th>
                                         <th className="w-1/6 truncate ... px-4 py-3">HPP</th>
                                         <th className="truncate ... px-4 py-3"></th>
                                     </tr>
@@ -67,33 +63,37 @@ export default function Stok() {
                                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     {loading ? (
                                         <tr>
-                                            <td colSpan="7" className="text-center py-4">
+                                            <td colSpan="8" className="text-center py-4">
                                                 Loading...
                                             </td>
                                         </tr>
                                     ) : (
-                                        dataStok.map((stok) => (
-                                            <tr key={stok} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                                                <td className="w-1/12 truncate ... px-4 py-3 text-sm">1</td>
-                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.nomor_invoice}</td>
-                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.tanggal}</td>
-                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.nama_customer}</td>
-                                                <td className="w-1/6 truncate ... px-4 py-3 text-sm">{stok.total_biaya}</td>
-                                                <td className="w-1/6 truncate ... px-4 py-3 text-xs">{stok.status}</td>
-                                                <td className="px-4 py-3 text-sm flex justify-end">
+                                        dataPenjualan.map((penjualan, index) => (
+                                            <tr
+                                                key={penjualan.id}
+                                                className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400"
+                                            >
+                                                <td className="w-1/12 truncate ... px-4 text-sm">{index + 1}</td>
+                                                <td className="w-1/6 truncate ... px-4 text-sm">{penjualan.kode || "-"}</td>
+                                                <td className="w-1/6 truncate ... px-4 text-sm">{penjualan.nama || "-"}</td>
+                                                <td className="w-1/6 truncate ... px-4 text-sm">{penjualan.harga_beli || "-"}</td>
+                                                <td className="w-1/6 truncate ... px-4 text-sm">{penjualan.harga_jual || "-"}</td>
+                                                <td className="w-1/6 truncate ... px-4 text-sm">{penjualan.jumlah_terjual || "-"}</td>
+                                                <td className="w-1/6 truncate ... px-4 text-sm">{penjualan.hpp || "-"}</td>
+                                                <td className="px-4 text-sm flex justify-end">
                                                     <button
                                                         type="button"
-                                                        className="mr-4 px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300"
-                                                        aria-label="Edit Order"
+                                                        className="text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
+                                                        // onClick={() => openEditModal(customer.id)}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
+                                                        Ubah
                                                     </button>
                                                     <button
                                                         type="button"
-                                                        className="px-3 py-2 text-xs font-medium text-center text-white bg-gray-300 rounded-md hover:bg-sky-700 focus:outline-none dark:bg-gray-100 dark:hover:bg-gray-300"
-                                                        aria-label="Delete Order"
+                                                        className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
+                                                        // onClick={() => handleDelete(customer.id)}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z" /><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8" /></svg>
+                                                        Hapus
                                                     </button>
                                                 </td>
                                             </tr>
@@ -123,6 +123,7 @@ export default function Stok() {
                     </div>
                 </div>
             </div>
+
         </div>
     );
 }
