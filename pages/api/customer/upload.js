@@ -8,6 +8,8 @@ export default async function handler(req, res) {
 
     const { data } = req.body; // Data dari file Excel
 
+    const trx = await db.transaction(); // Membuat transaksi
+
     try {
         // Loop melalui data dan simpan ke dalam database
         for (const customer of data) {
@@ -22,8 +24,8 @@ export default async function handler(req, res) {
                 formattedGender = customer.Gender;
             }
 
-            await db("customers").insert({
-                name: customer.Name || "", // Nama tidak boleh kosong, dapat dihandle dengan cara lain pada loop nanti
+            await trx("customers").insert({
+                name: customer.Name || "",
                 address: customer.Address || null,
                 email: customer.Email || null,
                 phone: customer.Phone || null,
@@ -32,9 +34,12 @@ export default async function handler(req, res) {
             });
         }
 
+        await trx.commit(); // Commit transaksi jika berhasil
+
         return res.status(200).json({ message: "Data uploaded successfully" });
     } catch (error) {
         console.error(error); // Debugging
+        await trx.rollback(); // Batalkan transaksi jika terjadi kesalahan
         return res.status(500).json({ error: "An error occurred while uploading data" });
     }
 }

@@ -93,6 +93,7 @@ function isValidPassword(password) {
 }
 
 function isValidName(name) {
-    const nameRegex = /^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$/;
+    // const nameRegex = /^[A-Z][a-zA-Z]*( [A-Z][a-zA-Z]*)*$/;
+    const nameRegex = /^[A-Za-z ]*$/;
     return nameRegex.test(name) && name.length >= MIN_NAME_LENGTH && name.length <= MAX_NAME_LENGTH;
 }

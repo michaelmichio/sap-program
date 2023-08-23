@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const dataPenjualan = await db.select().table("penjualan").orderBy("id", "desc"); // .orderBy("id", "desc");
+        const dataPenjualan = await db.select().table("penjualan").orderBy("id", "desc");
         return res.status(200).json({
             data: dataPenjualan
         });
