@@ -52,14 +52,6 @@ export default function Sidebar() {
                             <span className="ml-2 text-sm tracking-wide truncate">STOK BARANG</span>
                         </Link>
                     </li>
-                    <li>
-                        <Link href="/laporan" className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-sky-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-sky-500 dark:hover:border-gray-800 pr-6">
-                            {/* <span className="inline-flex justify-center items-center ml-4">
-                                <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>
-                            </span> */}
-                            <span className="ml-2 text-sm tracking-wide truncate">LAPORAN</span>
-                        </Link>
-                    </li>
                 </ul>
                 <p className="mb-14 px-5 py-3 hidden md:block text-center text-xs">Copyright @2023</p>
             </div>

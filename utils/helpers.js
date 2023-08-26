@@ -5,7 +5,8 @@ export const formatISODate = (isoDate) => {
         const formattedDate = parsedDate.toISOString().split('T')[0];
         return formattedDate;
     } catch (error) {
-        console.error("Error formatting date:", error.message);
+        const errorMessage = "Error formatting date: " + error.message + ". The date will be set to null.";
+        console.error(errorMessage);
         return null; // Mengembalikan null jika terjadi kesalahan
     }
 };
@@ -94,20 +95,26 @@ export const fetchDeleteCustomerById = async (token, customerId) => {
     }
 };
 
-// UPLOAD CUSTOMER DATA
 export const uploadCustomerData = async (token, data) => {
     try {
-        await fetch("/api/customer/upload", {
+        const response = await fetch("/api/customer/upload", {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ data }), // Mengirimkan data dari file Excel ke server
+            body: JSON.stringify({ data }),
         });
 
-        console.log("Data uploaded successfully");
+        if (response.ok) {
+            console.log("Data uploaded successfully");
+            return true; // Mengembalikan true jika unggah berhasil
+        } else {
+            console.error("Error uploading data:", response.statusText);
+            return false; // Mengembalikan false jika terjadi kesalahan unggah
+        }
     } catch (error) {
         console.error("Error uploading data:", error.message);
+        return false; // Mengembalikan false jika terjadi kesalahan
     }
 };

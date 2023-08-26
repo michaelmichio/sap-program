@@ -29,8 +29,10 @@ export const getServerSideProps = async (context) => {
 export default function Customer(props) {
     const { token } = props;
     const [loading, setLoading] = useState(true);
+    // Read
     const [customers, setCustomers] = useState([]);
     const [fetchNewCustomerData, setFetchNewCustomerData] = useState(false);
+    // Create
     const [showAddModal, setShowAddModal] = useState(false);
     const [newCustomerData, setNewCustomerData] = useState({
         name: "",
@@ -41,6 +43,7 @@ export default function Customer(props) {
         gender: "",
     });
     const [showEditModal, setShowEditModal] = useState(false);
+    // Update
     const [editCustomerId, setEditCustomerId] = useState(null);
     const [editCustomerData, setEditCustomerData] = useState({
         name: "",
@@ -50,8 +53,37 @@ export default function Customer(props) {
         birthdate: "",
         gender: "",
     });
+    // Delete
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteCustomerId, setDeleteCustomerId] = useState(null);
+    // Import
+    const [showImportModal, setShowImportModal] = useState(false);
+    // Pop Up
+    const [popupMessage, setPopupMesage] = useState("");
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
+    // Search
+    const [searchQuery, setSearchQuery] = useState("");
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const totalItems = customers.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = customers.slice(indexOfFirstItem, indexOfLastItem);
+
+    const filteredCustomers = customers.filter((customer) => {
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        return (
+            customer.id.toString().toLowerCase().includes(lowerCaseQuery) ||
+            customer.name.toLowerCase().includes(lowerCaseQuery)
+        );
+    });
+    const noResults = filteredCustomers.length === 0;
+    const totalFilteredItems = filteredCustomers.length;
+    const totalFilteredPages = Math.ceil(totalFilteredItems / itemsPerPage);
+    const currentFilteredItems = filteredCustomers.slice(indexOfFirstItem, indexOfLastItem);
 
     // READ ALL CUSTOMER
     useEffect(() => {
@@ -69,6 +101,22 @@ export default function Customer(props) {
     }, [fetchNewCustomerData]);
 
     // CREATE CUSTOMER
+    const openAddModal = () => {
+        setShowAddModal(true);
+    };
+
+    const closeAddModal = () => {
+        setShowAddModal(false);
+        setNewCustomerData({
+            name: "",
+            address: "",
+            email: "",
+            phone: "",
+            birthdate: "",
+            gender: "",
+        });
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewCustomerData((prevData) => ({
@@ -89,43 +137,7 @@ export default function Customer(props) {
         }
     };
 
-    const openAddModal = () => {
-        setShowAddModal(true);
-    };
-
-    const closeAddModal = () => {
-        setShowAddModal(false);
-        setNewCustomerData({
-            name: "",
-            address: "",
-            email: "",
-            phone: "",
-            birthdate: "",
-            gender: "",
-        });
-    };
-
     // EDIT CUSTOMER BY ID
-    const handleEditInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditCustomerData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleEditSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            await fetchEditCustomerById(token, editCustomerId, editCustomerData);
-            setFetchNewCustomerData(true);
-            closeEditModal();
-        } catch (error) {
-            console.error("Error editing customer:", error.message);
-        }
-    };
-
     const openEditModal = (customerId) => {
         const customerToEdit = customers.find((customer) => customer.id === customerId);
         if (customerToEdit) {
@@ -155,33 +167,150 @@ export default function Customer(props) {
         });
     };
 
+    const handleEditInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditCustomerData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            await fetchEditCustomerById(token, editCustomerId, editCustomerData);
+            setFetchNewCustomerData(true);
+            closeEditModal();
+
+            setPopupMesage("Customer berhasil diubah.");
+            setShowSuccessPopup(true);
+        } catch (error) {
+            console.error("Error editing customer:", error.message);
+
+            setPopupMesage("Customer gagal diubah.");
+            setShowErrorPopup(true);
+        }
+    };
+
     // DELETE CUSTOMER BY ID
-    const handleDelete = (customerId) => {
+    const openDeleteModal = (customerId) => {
         setDeleteCustomerId(customerId); // Set the customer ID to be deleted
         setShowDeleteModal(true); // Show the delete modal
+    };
+
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
     };
 
     const confirmDelete = async () => {
         try {
             await fetchDeleteCustomerById(token, deleteCustomerId);
             setFetchNewCustomerData(true);
+
+            setPopupMesage("Customer berhasil dihapus.");
+            setShowSuccessPopup(true);
         } catch (error) {
             console.error("Error deleting customer:", error.message);
+
+            setPopupMesage("Customer gagal dihapus.");
+            setShowErrorPopup(true);
         } finally {
             setShowDeleteModal(false); // Close the delete modal
             setDeleteCustomerId(null); // Reset the customer ID to be deleted
         }
     };
 
-    // EXPORT CUSTOMER DATA
-    const getColumnHeaderStyle = {
-        fill: { fgColor: { rgb: "CCCCCC" } }, // Warna abu-abu (#CCCCCC)
-        font: { bold: true },
+    // IMPORT CUSTOMER DATA
+    const openImportModal = () => {
+        setShowImportModal(true);
     };
 
-    const ExcelExportHelper = ({ data }) => {
-        const handleDownload = async () => {
-            const dataToDownload = customers.map((customer) => ({
+    const closeImportModal = () => {
+        setShowImportModal(false);
+    };
+
+    const readFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: "array" });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                // Modifikasi data untuk mengutamakan kolom pertama sebagai nama jika 'customer.Name' tidak ada
+                const modifiedData = jsonData.map((entry) => {
+                    // const name = entry['Name'] || entry[Object.keys(entry)[0]] || "";
+                    // const address = entry['Address'] || entry[Object.keys(entry)[1]] || null;
+                    // const email = entry['Email'] || entry[Object.keys(entry)[2]] || null;
+                    // const phone = entry['Phone'] || entry[Object.keys(entry)[3]] || null;
+                    // const birthdate = entry['Birthdate'] || entry[Object.keys(entry)[4]] || null;
+                    // const gender = entry['Gender'] || entry[Object.keys(entry)[5]] || null;
+
+                    const name = entry['Name'] || "";
+                    const address = entry['Address'] || null;
+                    const email = entry['Email'] || null;
+                    const phone = entry['Phone'] || null;
+                    const birthdate = entry['Birthdate'] || null;
+                    const gender = entry['Gender'] || null;
+
+                    return {
+                        name,
+                        address,
+                        email,
+                        phone,
+                        birthdate,
+                        gender,
+                    };
+                });
+
+                resolve(modifiedData);
+            };
+
+            reader.onerror = (error) => {
+                reject(error);
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+    };
+
+    const handleImport = async (e) => {
+        e.preventDefault();
+        const fileInput = e.target.querySelector('input[type="file"]');
+        const file = fileInput.files[0];
+
+        if (file) {
+            try {
+                const data = await readFile(file);
+                const uploadSuccess = await uploadCustomerData(token, data);
+
+                if (uploadSuccess) {
+                    setFetchNewCustomerData(true);
+
+                    setPopupMesage("Import berhasil dilakukan.");
+                    setShowSuccessPopup(true);
+                } else {
+                    setPopupMesage("Import gagal dilakukan.");
+                    setShowErrorPopup(true);
+                }
+
+                closeImportModal();
+            } catch (error) {
+                console.error("Error reading file:", error.message);
+
+                setPopupMesage("Import gagal.");
+                setShowErrorPopup(true);
+            }
+        }
+    };
+
+    // EXPORT CUSTOMER DATA
+    const ExportButton = ({ data }) => {
+        const handleExport = async () => {
+            const dataToDownload = data.map((customer) => ({
                 Name: customer.name,
                 Address: customer.address,
                 Email: customer.email,
@@ -191,7 +320,7 @@ export default function Customer(props) {
             }));
 
             const workbook = await XlsxPopulate.fromBlankAsync();
-            const worksheet = workbook.addSheet('Data Pelanggan');
+            const worksheet = workbook.sheet(0); // Menggunakan sheet utama (indeks 0)
 
             // Set style untuk judul kolom
             const columnHeaderStyle = {
@@ -217,144 +346,130 @@ export default function Customer(props) {
                 worksheet.cell(`B${row}`).value(customer.Address);
                 worksheet.cell(`C${row}`).value(customer.Email);
                 worksheet.cell(`D${row}`).value(customer.Phone);
-                worksheet.cell(`E${row}`).value(customer.Birthdate);
+
+                // Mengubah format tanggal ke YYYY-MM-DD sebelum menambahkan ke worksheet
+                if (customer.Birthdate) {
+                    const formattedBirthdate = formatISODate(customer.Birthdate);
+                    worksheet.cell(`E${row}`).value(formattedBirthdate);
+                } else {
+                    worksheet.cell(`E${row}`).value(null); // Mengatasi masalah jika birthdate null
+                }
+
                 worksheet.cell(`F${row}`).value(customer.Gender);
             });
 
+            const currentDate = new Date();
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = currentDate.getFullYear();
+            const formattedDate = `${day}-${month}-${year}`;
+            const filename = `DATA_CUSTOMER-${formattedDate}.xlsx`;
+
             const excelBlob = await workbook.outputAsync();
-            FileSaver.saveAs(excelBlob, 'data_pelanggan.xlsx');
+            FileSaver.saveAs(excelBlob, filename);
         };
 
         return (
-            <button
-                onClick={() => {
-                    handleDownload();
-                }}
-                className="btn btn-primary float-end"
-            >
-                Export
-            </button>
+            <div className="flex flex-col justify-center ml-2 mr-2">
+                <button
+                    type="button"
+                    className="bg-green-400 hover:bg-green-300 text-white font-semibold py-2 px-4 rounded"
+                    onClick={handleExport}
+                >
+                    EXPORT
+                </button>
+            </div>
         );
     };
 
-    // const handleDownload = () => {
-    //     const dataToDownload = customers.map((customer) => ({
-    //         Name: customer.name,
-    //         Address: customer.address,
-    //         Email: customer.email,
-    //         Phone: customer.phone,
-    //         Birthdate: customer.birthdate,
-    //         Gender: customer.gender,
-    //     }));
+    // POP UP
+    useEffect(() => {
+        if (showSuccessPopup) {
+            const timer = setTimeout(() => {
+                setShowSuccessPopup(false);
+                setPopupMesage("");
+            }, 4500);
 
-    //     const worksheet = XLSX.utils.json_to_sheet(dataToDownload);
-
-    //     // Set style untuk judul kolom
-    //     worksheet["!cols"] = [
-    //         { wch: 20 },
-    //         { wch: 20 },
-    //         { wch: 25 },
-    //         { wch: 20 },
-    //         { wch: 25 },
-    //         { wch: 10 },
-    //     ];
-
-    //     // Tambah gaya untuk judul kolom
-    //     Object.keys(worksheet).forEach((cellRef) => {
-    //         if (cellRef.startsWith("A1")) {
-    //             const cell = worksheet[cellRef];
-    //             cell.s = getColumnHeaderStyle;
-    //         }
-    //     });
-
-    //     const workbook = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pelanggan");
-
-    //     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    //     const excelBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-
-    //     FileSaver.saveAs(excelBlob, "data_pelanggan.xlsx");
-    // };
-
-    // const handleDownload = () => {
-    //     const dataToDownload = customers.map((customer) => ({
-    //         Name: customer.name,
-    //         Address: customer.address,
-    //         Email: customer.email,
-    //         Phone: customer.phone,
-    //         Birthdate: customer.birthdate,
-    //         Gender: customer.gender,
-    //     }));
-
-    //     const worksheet = XLSX.utils.json_to_sheet(dataToDownload);
-    //     const workbook = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pelanggan");
-    //     XLSX.writeFile(workbook, "data_pelanggan.xlsx");
-    // };
-
-    // IMPORT CUSTOMER DATA
-    const readFile = (file) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-
-            reader.onload = (event) => {
-                const data = new Uint8Array(event.target.result);
-                const workbook = XLSX.read(data, { type: "array" });
-                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                resolve(jsonData);
+            return () => {
+                clearTimeout(timer);
             };
-
-            reader.onerror = (error) => {
-                reject(error);
-            };
-
-            reader.readAsArrayBuffer(file);
-        });
-    };
-
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            try {
-                const data = await readFile(file);
-                await uploadCustomerData(token, data); // Menjalankan fungsi untuk mengunggah data ke server
-                setFetchNewCustomerData(true);
-            } catch (error) {
-                console.error("Error uploading file:", error.message);
-            }
         }
-    };
+    }, [showSuccessPopup]);
+
+    useEffect(() => {
+        if (showErrorPopup) {
+            const timer = setTimeout(() => {
+                setShowErrorPopup(false);
+                setPopupMesage("");
+            }, 4500);
+
+            return () => {
+                clearTimeout(timer);
+            };
+        }
+    }, [showErrorPopup]);
 
     return (
         <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
+
             <Navbar />
+
             <Sidebar />
+
+            {showSuccessPopup && (
+                <div className="fixed w-full mt-4 z-50">
+                    <div className="modal-container bg-green-400 w-1/2 md:max-w-md mx-auto rounded shadow-lg z-50 fade-out">
+                        <div className="modal-content py-4 text-center px-6">
+                            <p className="text-white font-bold">{popupMessage}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showErrorPopup && (
+                <div className="fixed w-full mt-4 z-50">
+                    <div className="modal-container bg-red-400 w-1/2 md:max-w-md mx-auto rounded shadow-lg z-50 fade-out">
+                        <div className="modal-content py-4 text-center px-6">
+                            <p className="text-white font-bold">{popupMessage}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="h-full ml-14 mt-14 md:ml-64">
                 <div className="flex justify-between w-full px-4 mt-4">
                     <div className="w-1/2 box flex flex-col justify-center">
                         <div className="box-wrapper">
                             <div className=" bg-white rounded flex items-center w-full p-3 shadow-sm border border-gray-200">
                                 <button className="outline-none focus:outline-none"><svg className=" w-5 text-gray-600 h-5 cursor-pointer" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-                                <input type="search" name="" id="" placeholder="search" x-model="q" className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent" />
+                                <input
+                                    type="search"
+                                    name=""
+                                    id=""
+                                    placeholder="search"
+                                    x-model="q"
+                                    className="w-full pl-4 text-sm outline-none focus:outline-none bg-transparent"
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        setCurrentPage(1); // Set currentPage to 1 after search
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col justify-center ml-4 mr-4">
-                        <div className="flex flex-col justify-center ml-4 mr-4">
-                            {/* <button
+                    <div className="flex justify-end">
+                        <div className="flex flex-col justify-center ml-2 mr-2">
+                            <button
                                 type="button"
-                                className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"
-                                onClick={handleDownload}
+                                className="bg-green-400 hover:bg-green-300 text-white font-semibold py-2 px-4 rounded"
+                                onClick={openImportModal}
                             >
-                                CETAK
-                            </button> */}
+                                IMPORT
+                            </button>
                         </div>
-                    </div>
-                    <ExcelExportHelper></ExcelExportHelper>
-                    <input type="file" accept=".xlsx" onChange={handleFileUpload} />
-                    <div className="flex flex-col justify-center ml-4 mr-4">
-                        <div className="flex flex-col justify-center ml-4 mr-4">
+                        <ExportButton data={customers}></ExportButton>
+                        <div className="flex flex-col justify-center ml-2 mr-2">
                             <button
                                 type="button"
                                 className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"
@@ -380,7 +495,6 @@ export default function Customer(props) {
                                         <th className="truncate ... px-4 py-3"></th>
                                     </tr>
                                 </thead>
-
                                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     {loading ? (
                                         <tr>
@@ -388,13 +502,19 @@ export default function Customer(props) {
                                                 Loading...
                                             </td>
                                         </tr>
+                                    ) : (noResults ? (
+                                        <tr>
+                                            <td colSpan="7" className="text-center py-4">
+                                                Hasil tidak ditemukan.
+                                            </td>
+                                        </tr>
                                     ) : (
-                                        customers.map((customer, index) => (
+                                        currentFilteredItems.map((customer, index) => (
                                             <tr
                                                 key={customer.id}
                                                 className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400"
                                             >
-                                                <td className="w-1/12 truncate ... px-4 text-sm">{index + 1}</td>
+                                                <td className="w-1/12 truncate ... px-4 text-sm">{index + 1 + indexOfFirstItem}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{customer.id}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{customer.name || "-"}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{customer.address || "-"}</td>
@@ -411,30 +531,40 @@ export default function Customer(props) {
                                                     <button
                                                         type="button"
                                                         className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
-                                                        onClick={() => handleDelete(customer.id)}
+                                                        onClick={() => openDeleteModal(customer.id)}
                                                     >
                                                         Hapus
                                                     </button>
                                                 </td>
                                             </tr>
                                         ))
+                                    )
                                     )}
                                 </tbody>
-
                             </table>
                         </div>
                         <div className="flex flex-col px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                             <div className="flex flex-row justify-end">
-                                <span className="flex text-xs xs:text-sm text-gray-500 normal-case text-center"></span>
+                                <span className="flex text-xs xs:text-sm text-gray-500 normal-case text-center">
+                                    Halaman {currentPage} dari {totalFilteredPages} ({totalFilteredItems} data)
+                                </span>
                             </div>
                             <div className="flex flex-row justify-end mt-1">
                                 <div className="flex xs:mt-0">
                                     <button
-                                        className="text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-l">
+                                        className={`text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-l ${currentPage === 1 ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                                            }`}
+                                        onClick={() => setCurrentPage(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    >
                                         Prev
                                     </button>
                                     <button
-                                        className="text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-r">
+                                        className={`text-sm bg-gray-300 hover:bg-sky-700 text-white hover:text-white font-semibold py-2 px-4 rounded-r ${currentPage === totalPages ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                                            }`}
+                                        onClick={() => setCurrentPage(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    >
                                         Next
                                     </button>
                                 </div>
@@ -712,7 +842,7 @@ export default function Customer(props) {
                                 <p className="text-2xl font-bold">Hapus Customer</p>
                                 <button
                                     className="modal-close text-gray-500 hover:text-gray-700"
-                                    onClick={() => setShowDeleteModal(false)}
+                                    onClick={closeDeleteModal}
                                 >
                                     <svg
                                         className="fill-current"
@@ -731,7 +861,7 @@ export default function Customer(props) {
                                     </svg>
                                 </button>
                             </div>
-                            <p className="text-gray-700 my-8">Apakah Anda yakin ingin menghapus customer ini?</p>
+                            <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menghapus customer ini?</p>
                             <div className="mt-12">
                                 <button
                                     className="bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white font-semibold rounded py-2 px-4"
@@ -741,11 +871,65 @@ export default function Customer(props) {
                                 </button>
                                 <button
                                     className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
-                                    onClick={() => setShowDeleteModal(false)}
+                                    onClick={closeDeleteModal}
                                 >
                                     BATAL
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showImportModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
+                    <div className="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                        <div className="modal-content py-4 text-left px-6">
+                            <div className="flex justify-between items-center pb-3">
+                                <p className="text-2xl font-bold">Import Data Customer</p>
+                                <button
+                                    className="modal-close text-gray-500 hover:text-gray-700"
+                                    onClick={closeImportModal}
+                                >
+                                    <svg
+                                        className="fill-current"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 18 18"
+                                    >
+                                        <path
+                                            d="M1 1l16 16m0-16L1 17"
+                                            stroke="#808080"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <form onSubmit={handleImport}>
+                                <div className="flex flex-col mt-8">
+                                    <p className="text-gray-700 mb-4">Format file yang didukung adalah .xlsx</p>
+                                    <input type="file" accept=".xlsx" />
+                                </div>
+                                <div className="mt-12">
+                                    <button
+                                        type="submit"
+                                        className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"
+                                    >
+                                        Import
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
+                                        onClick={closeImportModal}
+                                    >
+                                        Batal
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
