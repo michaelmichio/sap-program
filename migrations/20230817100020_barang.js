@@ -5,7 +5,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable("barang", (table) => {
         table.increments("id").primary();
-        table.string("kode", 20).notNullable().unique();
+        table.string("kode", 20).notNullable();
         table.string("nama", 255).notNullable();
         table.decimal("harga_beli", 12, 2).notNullable(); // Decimal type for price with precision of 12 digits and 2 decimal places
         table.decimal("harga_jual_terbaru", 12, 2).notNullable(); // Decimal type for price with precision of 12 digits and 2 decimal places

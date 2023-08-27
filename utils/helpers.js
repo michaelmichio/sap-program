@@ -118,3 +118,87 @@ export const uploadCustomerData = async (token, data) => {
         return false; // Mengembalikan false jika terjadi kesalahan
     }
 };
+
+// READ ALL BARANG
+export const fetchAllBarangData = async (token) => {
+    try {
+        const response = await fetch('/api/stok', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch barang data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        throw new Error(`Error fetching barang data: ${error.message}`);
+    }
+};
+
+// CREATE BARANG
+export const fetchCreateBarang = async (token, newBarangData) => {
+    try {
+        const response = await fetch("/api/stok/create", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newBarangData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during barang registration: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during barang registration:", error.message);
+    }
+};
+
+// EDIT BARANG BY ID
+export const fetchEditBarangById = async (token, barangId, updatedBarangData) => {
+    try {
+        const response = await fetch(`/api/stok/update/${barangId}`, {
+            method: "PUT",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedBarangData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during barang edit: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during barang edit:", error.message);
+    }
+};
+
+// DELETE BARANG BY ID
+export const fetchDeleteBarangById = async (token, barangId) => {
+    try {
+        const response = await fetch(`/api/stok/delete/${barangId}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during barang deletion: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during barang deletion:", error.message);
+    }
+};

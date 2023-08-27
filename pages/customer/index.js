@@ -42,8 +42,8 @@ export default function Customer(props) {
         birthdate: "",
         gender: "",
     });
-    const [showEditModal, setShowEditModal] = useState(false);
     // Update
+    const [showEditModal, setShowEditModal] = useState(false);
     const [editCustomerId, setEditCustomerId] = useState(null);
     const [editCustomerData, setEditCustomerData] = useState({
         name: "",
@@ -67,23 +67,22 @@ export default function Customer(props) {
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-    const totalItems = customers.length;
+    const totalItems = customers.length; //
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = customers.slice(indexOfFirstItem, indexOfLastItem);
-
-    const filteredCustomers = customers.filter((customer) => {
+    // const currentItems = customers.slice(indexOfFirstItem, indexOfLastItem); //
+    const filteredItems = customers.filter((customer) => {
         const lowerCaseQuery = searchQuery.toLowerCase();
         return (
             customer.id.toString().toLowerCase().includes(lowerCaseQuery) ||
             customer.name.toLowerCase().includes(lowerCaseQuery)
         );
     });
-    const noResults = filteredCustomers.length === 0;
-    const totalFilteredItems = filteredCustomers.length;
+    const noResults = filteredItems.length === 0;
+    const totalFilteredItems = filteredItems.length;
     const totalFilteredPages = Math.ceil(totalFilteredItems / itemsPerPage);
-    const currentFilteredItems = filteredCustomers.slice(indexOfFirstItem, indexOfLastItem);
+    const currentFilteredItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
     // READ ALL CUSTOMER
     useEffect(() => {
@@ -137,7 +136,7 @@ export default function Customer(props) {
         }
     };
 
-    // EDIT CUSTOMER BY ID
+    // UPDATE CUSTOMER BY ID
     const openEditModal = (customerId) => {
         const customerToEdit = customers.find((customer) => customer.id === customerId);
         if (customerToEdit) {
@@ -505,7 +504,7 @@ export default function Customer(props) {
                                     ) : (noResults ? (
                                         <tr>
                                             <td colSpan="7" className="text-center py-4">
-                                                Hasil tidak ditemukan.
+                                                Tidak ada data yang ditemukan.
                                             </td>
                                         </tr>
                                     ) : (
@@ -516,9 +515,9 @@ export default function Customer(props) {
                                             >
                                                 <td className="w-1/12 truncate ... px-4 text-sm">{index + 1 + indexOfFirstItem}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{customer.id}</td>
-                                                <td className="w-1/6 truncate ... px-4 text-sm">{customer.name || "-"}</td>
-                                                <td className="w-1/6 truncate ... px-4 text-sm">{customer.address || "-"}</td>
-                                                <td className="w-1/6 truncate ... px-4 text-sm">{customer.email || "-"}</td>
+                                                <td className="uppercase w-1/6 truncate ... px-4 text-sm">{customer.name || "-"}</td>
+                                                <td className="uppercase w-1/6 truncate ... px-4 text-sm">{customer.address || "-"}</td>
+                                                <td className="lowercase w-1/6 truncate ... px-4 text-sm">{customer.email || "-"}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{customer.phone || "-"}</td>
                                                 <td className="px-4 text-sm flex justify-end">
                                                     <button
@@ -812,6 +811,7 @@ export default function Customer(props) {
                                         id="gender"
                                         value={editCustomerData.gender || ""}
                                         onChange={handleEditInputChange}
+                                        required
                                         className="w-full mt-1 p-2 bg-gray-200 rounded border focus:border-blue-500 focus:bg-white focus:outline-none"
                                     >
                                         <option value="pria">Pria</option>
