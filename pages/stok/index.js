@@ -217,7 +217,7 @@ export default function Stok(props) {
     };
 
     return (
-        <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
+        <div className="font-mono min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
 
             <Navbar />
 
@@ -313,14 +313,14 @@ export default function Stok(props) {
                                                         className="text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
                                                         onClick={() => openEditModal(barang.id)}
                                                     >
-                                                        Ubah
+                                                        UBAH
                                                     </button>
                                                     <button
                                                         type="button"
                                                         className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
                                                         onClick={() => openDeleteModal(barang.id)}
                                                     >
-                                                        Hapus
+                                                        HAPUS
                                                     </button>
                                                 </td>
                                             </tr>

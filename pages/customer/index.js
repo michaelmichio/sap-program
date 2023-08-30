@@ -75,8 +75,8 @@ export default function Customer(props) {
     const filteredItems = customers.filter((customer) => {
         const lowerCaseQuery = searchQuery.toLowerCase();
         return (
-            customer.id.toString().toLowerCase().includes(lowerCaseQuery) ||
-            customer.name.toLowerCase().includes(lowerCaseQuery)
+            customer.id.toString().toLowerCase().includes(lowerCaseQuery) || //
+            customer.name.toLowerCase().includes(lowerCaseQuery) //
         );
     });
     const noResults = filteredItems.length === 0;
@@ -372,7 +372,7 @@ export default function Customer(props) {
             <div className="flex flex-col justify-center ml-2 mr-2">
                 <button
                     type="button"
-                    className="bg-green-400 hover:bg-green-300 text-white font-semibold py-2 px-4 rounded"
+                    className="bg-green-500 hover:bg-green-400 text-white font-semibold py-2 px-4 rounded"
                     onClick={handleExport}
                 >
                     EXPORT
@@ -409,7 +409,7 @@ export default function Customer(props) {
     }, [showErrorPopup]);
 
     return (
-        <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
+        <div className="font-mono min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
 
             <Navbar />
 
@@ -461,7 +461,7 @@ export default function Customer(props) {
                         <div className="flex flex-col justify-center ml-2 mr-2">
                             <button
                                 type="button"
-                                className="bg-green-400 hover:bg-green-300 text-white font-semibold py-2 px-4 rounded"
+                                className="bg-green-500 hover:bg-green-400 text-white font-semibold py-2 px-4 rounded"
                                 onClick={openImportModal}
                             >
                                 IMPORT
@@ -525,14 +525,14 @@ export default function Customer(props) {
                                                         className="text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
                                                         onClick={() => openEditModal(customer.id)}
                                                     >
-                                                        Ubah
+                                                        UBAH
                                                     </button>
                                                     <button
                                                         type="button"
                                                         className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
                                                         onClick={() => openDeleteModal(customer.id)}
                                                     >
-                                                        Hapus
+                                                        HAPUS
                                                     </button>
                                                 </td>
                                             </tr>

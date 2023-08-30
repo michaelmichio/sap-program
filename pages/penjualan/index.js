@@ -29,7 +29,7 @@ export default function Penjualan() {
     }, []);
 
     return (
-        <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
+        <div className="font-mono min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
             <Navbar />
             <Sidebar />
             <div className="h-full ml-14 mt-14 md:ml-64">

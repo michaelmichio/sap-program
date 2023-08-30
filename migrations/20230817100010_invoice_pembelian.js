@@ -8,6 +8,7 @@ exports.up = function(knex) {
         table.string("nomor_invoice", 50).notNullable().unique();
         table.date("tanggal").notNullable();
         table.string("pemasok", 100).notNullable();
+        table.enum("status", ["pending", "selesai", "batal"]);
 
         table.timestamps(true, true);
     });

@@ -202,3 +202,130 @@ export const fetchDeleteBarangById = async (token, barangId) => {
         console.error("Error during barang deletion:", error.message);
     }
 };
+
+// READ ALL INVOICE PEMBELIAN
+export const fetchAllInvoiceData = async (token) => {
+    try {
+        const response = await fetch('/api/pembelian/invoice', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch invoice pembelian data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        throw new Error(`Error fetching invoice pembelian data: ${error.message}`);
+    }
+};
+
+// READ ALL PEMBELIAN BY INVOICE ID
+export const fetchPembelianDataByInvoiceId = async (token, invoiceId) => {
+    try {
+        const response = await fetch(`/api/pembelian/${invoiceId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch pembelian data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw new Error(`Error fetching pembelian data: ${error.message}`);
+    }
+};
+
+// CREATE INVOICE PEMBELIAN
+export const fetchCreateInvoicePembelian = async (token, newInvoiceData) => {
+    try {
+        const response = await fetch("/api/pembelian/createInvoice", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newInvoiceData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during invoice registration: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during invoice registration:", error.message);
+    }
+}
+
+// CREATE PEMBELIAN BY INVOICE ID
+export const fetchCreatePembelianByInvoiceId = async (token, newPembelianData) => {
+    try {
+        const response = await fetch("/api/pembelian/createPembelian", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newPembelianData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during pembelian by invoice registration: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during pembelian by invoice registration:", error.message);
+    }
+};
+
+// EDIT INVOICE BY ID
+export const fetchEditInvoiceById = async (token, invoiceId) => {
+    try {
+        const response = await fetch(`/api/pembelian/updateInvoice/${invoiceId}`, {
+            method: "PUT",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during invoice edit: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during invoice edit:", error.message);
+    }
+};
+
+// DELETE INVOICE BY ID
+export const fetchDeleteInvoiceById = async (token, invoiceId) => {
+    try {
+        console.log("A");
+        const response = await fetch(`/api/pembelian/deleteInvoice/${invoiceId}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during invoice deletion: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during invoice deletion:", error.message);
+    }
+};
