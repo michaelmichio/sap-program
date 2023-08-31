@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getCookies } from "cookies-next";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import { fetchAllInvoiceData, fetchCreateInvoicePembelian, fetchCreatePembelianByInvoiceId, fetchDeleteInvoiceById, fetchEditInvoiceById, fetchPembelianDataByInvoiceId, formatISODate } from "@/utils/helpers";
+import { fetchAllInvoiceData, fetchCreateInvoicePembelian, fetchCreatePembelianByInvoiceId, fetchDeleteInvoiceById, fetchDeletePembelianById, fetchEditInvoiceById, fetchPembelianDataByInvoiceId, formatISODate } from "@/utils/helpers";
 
 export const getServerSideProps = async (context) => {
     const cookies = getCookies(context);
@@ -75,6 +75,10 @@ export default function Pembelian(props) {
     // DELETE INVOICE
     const [showDeleteInvoiceModal, setShowDeleteInvoiceModal] = useState(false);
     const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
+
+    // DELETE PEMBELIAN
+    const [showDeletePembelianModal, setShowDeletePembelianModal] = useState(false);
+    const [deletePembelianId, setDeletePembelianId] = useState(null);
 
     // POP UP
     const [popupMessage, setPopupMesage] = useState("");
@@ -306,6 +310,36 @@ export default function Pembelian(props) {
         } finally {
             setShowDeleteInvoiceModal(false); // Close the delete modal
             setDeleteInvoiceId(null); // Reset the invoice ID to be deleted
+        }
+    };
+
+    // DELETE PEMBELIAN BY ID
+    const openDeletePembelianModal = (pembelianId) => {
+        setDeletePembelianId(pembelianId); // Set the pembelian ID to be deleted
+        setShowDeletePembelianModal(true); // Show the delete modal
+    };
+
+    const closeDeletePembelianModal = () => {
+        setShowDeletePembelianModal(false);
+    };
+
+    const confirmDeletePembelian = async (e) => {
+        e.preventDefault();
+
+        try {
+            await fetchDeletePembelianById(token, deletePembelianId);
+            setFetchNewPembelianData(true);
+
+            setPopupMesage("Pembelian berhasil dihapus.");
+            setShowSuccessPopup(true);
+        } catch (error) {
+            console.error("Error deleting pembelian:", error.message);
+
+            setPopupMesage("Pembelian gagal dihapus.");
+            setShowErrorPopup(true);
+        } finally {
+            setShowDeletePembelianModal(false); // Close the delete modal
+            setDeletePembelianId(null); // Reset the pembelian ID to be deleted
         }
     };
 
@@ -768,7 +802,7 @@ export default function Pembelian(props) {
                                                                     <button
                                                                         type="button"
                                                                         className="text-xs text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
-                                                                        onClick={() => openDeleteBarangModal(pembelian.id)}
+                                                                        onClick={() => openDeletePembelianModal(pembelian.id)}
                                                                     >
                                                                         HAPUS
                                                                     </button>
@@ -947,7 +981,7 @@ export default function Pembelian(props) {
                                 </button>
                             </div>
                             <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menghapus invoice ini?</p>
-                            <p className="text-gray-700">Invoice harus kosong sebelum dihapus!</p>
+                            <p className="text-gray-700">Invoice harus kosong sebelum dihapus.</p>
                             <div className="mt-12">
                                 <button
                                     className="bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white font-semibold rounded py-2 px-4"
@@ -967,7 +1001,53 @@ export default function Pembelian(props) {
                 </div>
             )}
 
-            {/* {showDeleteBarangModal && (<></>)} */}
+            {showDeletePembelianModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
+                    <div className="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                        <div className="modal-content py-4 text-left px-6">
+                            <div className="flex justify-between items-center pb-3">
+                                <p className="text-2xl font-bold">Hapus Barang</p>
+                                <button
+                                    className="modal-close text-gray-500 hover:text-gray-700"
+                                    onClick={closeDeletePembelianModal}
+                                >
+                                    <svg
+                                        className="fill-current"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 18 18"
+                                    >
+                                        <path
+                                            d="M1 1l16 16m0-16L1 17"
+                                            stroke="#808080"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menghapus barang ini?</p>
+                            <div className="mt-12">
+                                <button
+                                    className="bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white font-semibold rounded py-2 px-4"
+                                    onClick={confirmDeletePembelian}
+                                >
+                                    HAPUS
+                                </button>
+                                <button
+                                    className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
+                                    onClick={closeDeletePembelianModal}
+                                >
+                                    BATAL
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
 

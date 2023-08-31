@@ -312,7 +312,6 @@ export const fetchEditInvoiceById = async (token, invoiceId) => {
 // DELETE INVOICE BY ID
 export const fetchDeleteInvoiceById = async (token, invoiceId) => {
     try {
-        console.log("A");
         const response = await fetch(`/api/pembelian/deleteInvoice/${invoiceId}`, {
             method: "DELETE",
             headers: {
@@ -327,5 +326,25 @@ export const fetchDeleteInvoiceById = async (token, invoiceId) => {
         }
     } catch (error) {
         console.error("Error during invoice deletion:", error.message);
+    }
+};
+
+// DELETE PEMBELIAN BY ID
+export const fetchDeletePembelianById = async (token, pembelianId) => {
+    try {
+        const response = await fetch(`/api/pembelian/deletePembelian/${pembelianId}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during pembelian deletion: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during pembelian deletion:", error.message);
     }
 };
