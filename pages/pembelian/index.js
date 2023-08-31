@@ -981,7 +981,6 @@ export default function Pembelian(props) {
                                 </button>
                             </div>
                             <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menghapus invoice ini?</p>
-                            <p className="text-gray-700">Invoice harus kosong sebelum dihapus.</p>
                             <div className="mt-12">
                                 <button
                                     className="bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white font-semibold rounded py-2 px-4"

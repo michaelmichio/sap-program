@@ -8,15 +8,24 @@ export default async function handler(req, res) {
     const { id } = req.query;
 
     try {
-        const deletedInvoice = await db("invoice_pembelian")
-            .where({ id: id })
-            .del();
+        // Menggunakan transaksi untuk menghapus data pada kedua tabel secara atomik
+        await db.transaction(async (trx) => {
+            // Hapus entri pada tabel "pembelian" terlebih dahulu
+            await trx("pembelian")
+                .where("invoice_pembelian_id", id)
+                .del();
 
-        if (deletedInvoice) {
-            return res.status(200).json({ message: "Invoice deleted successfully." });
-        } else {
-            return res.status(404).json({ error: "Invoice not found." });
-        }
+            // Kemudian, hapus entri pada tabel "invoice_pembelian"
+            const deletedInvoice = await trx("invoice_pembelian")
+                .where({ id: id })
+                .del();
+
+            if (deletedInvoice) {
+                return res.status(200).json({ message: "Invoice and related purchases deleted successfully." });
+            } else {
+                return res.status(404).json({ error: "Invoice not found." });
+            }
+        });
     } catch (error) {
         console.error("Error deleting invoice:", error);
         return res.status(500).json({ error: "Internal Server Error." });
