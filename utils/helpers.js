@@ -349,7 +349,7 @@ export const fetchDeletePembelianById = async (token, pembelianId) => {
     }
 };
 
-// READ ALL INVOICE Penjualan
+// READ ALL INVOICE PENJUALAN
 export const fetchAllInvoicePenjualanData = async (token) => {
     try {
         const response = await fetch('/api/penjualan/invoice', {
@@ -368,3 +368,25 @@ export const fetchAllInvoicePenjualanData = async (token) => {
         throw new Error(`Error fetching invoice penjualan data: ${error.message}`);
     }
 };
+
+// CREATE INVOICE PENJUALAN
+export const fetchCreateInvoicePenjualan = async (token, newInvoiceData) => {
+    try {
+        const response = await fetch("/api/penjualan/createInvoice", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newInvoiceData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during invoice registration: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during invoice registration:", error.message);
+    }
+}

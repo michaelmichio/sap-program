@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import Select from 'react-select';
 import { getCookies } from "cookies-next";
 import jwt from "jsonwebtoken";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import { fetchAllInvoicePenjualanData } from "@/utils/helpers";
+import { fetchAllCustomerData, fetchAllInvoicePenjualanData, fetchCreateInvoicePenjualan, formatISODate } from "@/utils/helpers";
 import { JWT_PRIVATE_KEY } from "@/utils/constants";
+import { data } from "autoprefixer";
 
 export const getServerSideProps = async (context) => {
     const cookies = getCookies(context);
@@ -48,6 +50,11 @@ export default function Penjualan(props) {
     // });
     // const [selectedPenjualanData, setSelectedPenjualanData] = useState([]);
     // const [fetchNewPenjualanData, setFetchNewPenjualanData] = useState(false);
+
+    // READ ALL CUSTOMER
+    const [customers, setCustomers] = useState([]);
+    const [fetchNewCustomerData, setFetchNewCustomerData] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
 
     // CREATE INVOICE
     const [showAddInvoiceModal, setShowAddInvoiceModal] = useState(false);
@@ -93,10 +100,8 @@ export default function Penjualan(props) {
     // Mendekripsi token
     useEffect(() => {
         if (token) {
-            console.log(token);
             try {
                 const decodedToken = jwt.verify(token, JWT_PRIVATE_KEY);
-                console.log(decodedToken);
                 setUserId(decodedToken.id); // Mendapatkan ID pengguna dari payload token
             } catch (error) {
                 console.error('Error decoding token:', error);
@@ -120,6 +125,39 @@ export default function Penjualan(props) {
         setFetchNewInvoiceData(false);
     }, [fetchNewInvoiceData]);
 
+    // READ ALL CUSTOMER
+    useEffect(() => {
+        fetchAllCustomerData(token)
+            .then((data) => {
+                // setCustomers(data);
+                const options = data.map((customer) => ({
+                    value: customer.id,
+                    label: customer.name,
+                }));
+                setCustomers(options);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error(error.message);
+                setLoading(false);
+            });
+
+        setFetchNewCustomerData(false);
+    }, [fetchNewCustomerData]);
+
+    // const handleSearchCustomer = (searchTerm) => {
+    //     // Filter data customer berdasarkan kata kunci pencarian
+    //     const filtered = customers.filter((customer) =>
+    //         customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    //     );
+    //     setFilteredCustomers(filtered);
+    // };
+
+    // useEffect(() => {
+    //     // Ketika data customer berubah, reset hasil pencarian
+    //     setFilteredCustomers(customers);
+    // }, [customers]);
+
     // CREATE INVOICE
     const openAddInvoiceModal = () => {
         setShowAddInvoiceModal(true);
@@ -136,8 +174,9 @@ export default function Penjualan(props) {
             nomor_rangka: "",
             nomor_mesin: "",
             nomor_spk: "",
-            id_user: userId,
+            id_user: "",
         });
+        setSelectedCustomer(null);
     };
 
     const handleInputInvoiceChange = (e) => {
@@ -146,19 +185,29 @@ export default function Penjualan(props) {
         setNewInvoiceData((prevData) => ({
             ...prevData,
             [name]: value,
+            id_user: userId,
         }));
     };
+
+    useEffect(() => {
+        if (selectedCustomer) {
+            setNewInvoiceData((prevData) => ({
+                ...prevData,
+                id_customer: selectedCustomer.value,
+            }));
+        }
+    }, [selectedCustomer]);
 
     const handleInvoiceSubmit = async (e) => {
         e.preventDefault();
 
-        // try {
-        //     await fetchCreateInvoicePenjualan(token, newInvoiceData);
-        //     setFetchNewInvoiceData(true);
-        //     closeAddInvoiceModal();
-        // } catch (error) {
-        //     console.error("Error creating invoice:", error.message);
-        // }
+        try {
+            await fetchCreateInvoicePenjualan(token, newInvoiceData);
+            setFetchNewInvoiceData(true);
+            closeAddInvoiceModal();
+        } catch (error) {
+            console.error("Error creating invoice:", error.message);
+        }
     };
 
     return (
@@ -222,7 +271,6 @@ export default function Penjualan(props) {
                                         <th className="w-1/6 truncate ... px-4 py-3">Nomor Invoice</th>
                                         <th className="w-1/6 truncate ... px-4 py-3">Tanggal Invoice</th>
                                         <th className="w-1/6 truncate ... px-4 py-3">Nama Customer</th>
-                                        <th className="w-1/6 truncate ... px-4 py-3">Nama Karyawan</th>
                                         <th className="w-1/6 truncate ... px-4 py-3">Total Biaya</th>
                                         <th className="w-1/6 truncate ... px-4 py-3">Status</th>
                                         <th className="truncate ... px-4 py-3"></th>
@@ -251,7 +299,6 @@ export default function Penjualan(props) {
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{invoice.nomor_invoice}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{formatISODate(invoice.tanggal)}</td>
                                                 <td className="uppercase w-1/6 truncate ... px-4 text-sm">{invoice.nama_customer}</td>
-                                                <td className="uppercase w-1/6 truncate ... px-4 text-sm">{invoice.nama_user}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{invoice.total_sales || "0"}</td>
                                                 <td className="uppercase w-1/6 truncate ... px-4 text-sm">{invoice.status}</td>
                                                 <td className="px-4 text-sm flex justify-end">
@@ -260,7 +307,7 @@ export default function Penjualan(props) {
                                                         className="text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
                                                         onClick={() => openSelectedInvoiceModal(invoice)}
                                                     >
-                                                        {invoice.status === "pending" ? "UBAH" : "LIHAT"}
+                                                        {invoice.status === "pending" ? "INPUT" : "LIHAT"}
                                                     </button>
                                                     {invoice.status === "pending" && (
                                                         <button
@@ -339,8 +386,8 @@ export default function Penjualan(props) {
                                 </button>
                             </div>
                             <form onSubmit={handleInvoiceSubmit}>
-                                <div className="mt-4">
-                                    <label htmlFor="nomor_invoice" className="block text-gray-700 text-sm font-bold mb-2">
+                                <div className="mt-2">
+                                    <label htmlFor="nomor_invoice" className="block text-gray-700 text-sm font-bold">
                                         Nomor Invoice
                                     </label>
                                     <input
@@ -349,26 +396,12 @@ export default function Penjualan(props) {
                                         name="nomor_invoice"
                                         value={dataInvoice.nomor_invoice}
                                         onChange={handleInputInvoiceChange}
-                                        className="mt-1 p-2 border border-gray-300 rounded w-full"
+                                        className="p-2 border border-gray-300 rounded w-full"
                                         required
                                     />
                                 </div>
-                                <div className="mt-4">
-                                    <label htmlFor="pemasok" className="block text-gray-700 text-sm font-bold mb-2">
-                                        Pemasok/Supplier
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="pemasok"
-                                        name="pemasok"
-                                        value={dataInvoice.pemasok}
-                                        onChange={handleInputInvoiceChange}
-                                        className="mt-1 p-2 border border-gray-300 rounded w-full"
-                                        required
-                                    />
-                                </div>
-                                <div className="mt-4">
-                                    <label htmlFor="tanggal" className="block text-gray-700 text-sm font-bold mb-2">
+                                <div className="mt-2">
+                                    <label htmlFor="tanggal" className="block text-gray-700 text-sm font-bold">
                                         Tanggal Invoice
                                     </label>
                                     <input
@@ -377,11 +410,91 @@ export default function Penjualan(props) {
                                         name="tanggal"
                                         value={dataInvoice.tanggal}
                                         onChange={handleInputInvoiceChange}
-                                        className="mt-1 p-2 border border-gray-300 rounded w-full"
+                                        className="p-2 border border-gray-300 rounded w-full"
                                         required
                                     />
                                 </div>
-                                <div className="mt-6">
+                                <div className="mt-2">
+                                    <label htmlFor="id_customer" className="block text-gray-700 text-sm font-bold">
+                                        Customer
+                                    </label>
+                                    <Select
+                                        id="id_customer"
+                                        name="id_customer"
+                                        options={customers}
+                                        value={selectedCustomer}
+                                        onChange={(selectedOption) => setSelectedCustomer(selectedOption)}
+                                        isSearchable
+                                        placeholder="Pilih customer"
+                                        required
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <label htmlFor="jenis_kendaraan" className="block text-gray-700 text-sm font-bold">
+                                        Jenis Kendaraan
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="jenis_kendaraan"
+                                        name="jenis_kendaraan"
+                                        value={dataInvoice.jenis_kendaraan}
+                                        onChange={handleInputInvoiceChange}
+                                        className="p-2 border border-gray-300 rounded w-full"
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <label htmlFor="nomor_polisi" className="block text-gray-700 text-sm font-bold">
+                                        Nomor Polisi
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nomor_polisi"
+                                        name="nomor_polisi"
+                                        value={dataInvoice.nomor_polisi}
+                                        onChange={handleInputInvoiceChange}
+                                        className="p-2 border border-gray-300 rounded w-full"
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <label htmlFor="nomor_mesin" className="block text-gray-700 text-sm font-bold">
+                                        Nomor Mesin
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nomor_mesin"
+                                        name="nomor_mesin"
+                                        value={dataInvoice.nomor_mesin}
+                                        onChange={handleInputInvoiceChange}
+                                        className="p-2 border border-gray-300 rounded w-full"
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <label htmlFor="nomor_rangka" className="block text-gray-700 text-sm font-bold">
+                                        Nomor Rangka
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nomor_rangka"
+                                        name="nomor_rangka"
+                                        value={dataInvoice.nomor_rangka}
+                                        onChange={handleInputInvoiceChange}
+                                        className="p-2 border border-gray-300 rounded w-full"
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <label htmlFor="nomor_spk" className="block text-gray-700 text-sm font-bold">
+                                        Nomor SPK
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nomor_spk"
+                                        name="nomor_spk"
+                                        value={dataInvoice.nomor_spk}
+                                        onChange={handleInputInvoiceChange}
+                                        className="p-2 border border-gray-300 rounded w-full"
+                                    />
+                                </div>
+                                <div className="mt-4">
                                     <button
                                         type="submit"
                                         className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"

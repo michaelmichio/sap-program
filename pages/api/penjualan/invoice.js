@@ -11,6 +11,7 @@ export default async function handler(req, res) {
             .select(
                 "invoice_penjualan.id",
                 "invoice_penjualan.nomor_invoice",
+                "invoice_penjualan.tanggal",
                 "invoice_penjualan.status",
                 "customers.name as nama_customer",
                 "invoice_penjualan.jenis_kendaraan",

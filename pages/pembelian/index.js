@@ -411,7 +411,7 @@ export default function Pembelian(props) {
                                                         className="text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
                                                         onClick={() => openSelectedInvoiceModal(invoice)}
                                                     >
-                                                        {invoice.status === "pending" ? "UBAH" : "LIHAT"}
+                                                        {invoice.status === "pending" ? "INPUT" : "LIHAT"}
                                                     </button>
                                                     {invoice.status === "pending" && (
                                                         <button
