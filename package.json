@@ -16,7 +16,7 @@
     "cookies-next": "^2.1.2",
     "dotenv-cli": "^7.3.0",
     "file-saver": "^2.0.5",
-    "jsonwebtoken": "^9.0.0",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^2.4.2",
     "mysql": "^2.18.1",
     "next": "^13.1.6",

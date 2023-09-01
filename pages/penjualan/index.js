@@ -94,14 +94,14 @@ export default function Penjualan(props) {
     useEffect(() => {
         if (token) {
             console.log(token);
-            // try {
-            //     const decodedToken = jwt.verify(token, JWT_PRIVATE_KEY);
-            //     console.log(decodedToken);
-            //     setUserId(decodedToken.id); // Mendapatkan ID pengguna dari payload token
-            // } catch (error) {
-            //     console.error('Error decoding token:', error);
-            //     // Handle kesalahan dekripsi token
-            // }
+            try {
+                const decodedToken = jwt.verify(token, JWT_PRIVATE_KEY);
+                console.log(decodedToken);
+                setUserId(decodedToken.id); // Mendapatkan ID pengguna dari payload token
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                // Handle kesalahan dekripsi token
+            }
         }
     }, []);
 
