@@ -40,6 +40,7 @@ async function getUserByUsername(username) {
 
 function generateAuthToken(user) {
     const tokenPayload = {
+        id: user.id, // Tambahkan ID pengguna ke payload token
         username: user.username,
         name: user.name,
     };

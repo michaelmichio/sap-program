@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getCookies } from "cookies-next";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import { fetchAllInvoiceData, fetchCreateInvoicePembelian, fetchCreatePembelianByInvoiceId, fetchDeleteInvoiceById, fetchDeletePembelianById, fetchEditInvoiceById, fetchPembelianDataByInvoiceId, formatISODate } from "@/utils/helpers";
+import { fetchAllInvoicePembelianData, fetchCreateInvoicePembelian, fetchCreatePembelianByInvoiceId, fetchDeleteInvoiceById, fetchDeletePembelianById, fetchEditInvoiceById, fetchPembelianDataByInvoiceId, formatISODate } from "@/utils/helpers";
 
 export const getServerSideProps = async (context) => {
     const cookies = getCookies(context);
@@ -24,7 +24,6 @@ export const getServerSideProps = async (context) => {
 }
 
 export default function Pembelian(props) {
-
     const { token } = props;
     const [loading, setLoading] = useState(true);
 
@@ -95,7 +94,7 @@ export default function Pembelian(props) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const filteredItems = dataInvoice.filter((invoice) => {
+    const filteredItems = dataInvoice.filter((invoice) => { //
         const lowerCaseQuery = searchQuery.toLowerCase();
         return (
             invoice.nomor_invoice.toString().toLowerCase().includes(lowerCaseQuery) || //
@@ -109,7 +108,7 @@ export default function Pembelian(props) {
 
     // READ ALL INVOICE
     useEffect(() => {
-        fetchAllInvoiceData(token)
+        fetchAllInvoicePembelianData(token)
             .then((data) => {
                 setDataInvoice(data);
                 setLoading(false);
@@ -156,20 +155,6 @@ export default function Pembelian(props) {
     // CREATE INVOICE
     const openAddInvoiceModal = () => {
         setShowAddInvoiceModal(true);
-        setNewPembelianData({
-            nomor_invoice: selectedInvoiceData.nomor_invoice,
-            tanggal: selectedInvoiceData.tanggal,
-            pemasok: selectedInvoiceData.pemasok,
-            kode_barang: "",
-            nama_barang: "",
-            jumlah: "",
-            harga: "",
-            gross: "",
-            diskon: "",
-            ppn: "",
-            total_harga: "",
-            invoice_pembelian_id: selectedInvoiceData.id,
-        });
     };
 
     const closeAddInvoiceModal = () => {
@@ -178,20 +163,6 @@ export default function Pembelian(props) {
             nomor_invoice: "",
             tanggal: "",
             pemasok: "",
-        });
-        setNewPembelianData({
-            nomor_invoice: "",
-            tanggal: "",
-            pemasok: "",
-            kode_barang: "",
-            nama_barang: "",
-            jumlah: "",
-            harga: "",
-            gross: "",
-            diskon: "",
-            ppn: "",
-            total_harga: "",
-            invoice_pembelian_id: "",
         });
     };
 

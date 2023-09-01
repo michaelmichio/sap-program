@@ -204,7 +204,7 @@ export const fetchDeleteBarangById = async (token, barangId) => {
 };
 
 // READ ALL INVOICE PEMBELIAN
-export const fetchAllInvoiceData = async (token) => {
+export const fetchAllInvoicePembelianData = async (token) => {
     try {
         const response = await fetch('/api/pembelian/invoice', {
             headers: {
@@ -346,5 +346,25 @@ export const fetchDeletePembelianById = async (token, pembelianId) => {
         }
     } catch (error) {
         console.error("Error during pembelian deletion:", error.message);
+    }
+};
+
+// READ ALL INVOICE Penjualan
+export const fetchAllInvoicePenjualanData = async (token) => {
+    try {
+        const response = await fetch('/api/penjualan/invoice', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch invoice penjualan data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw new Error(`Error fetching invoice penjualan data: ${error.message}`);
     }
 };
