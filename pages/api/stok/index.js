@@ -6,7 +6,13 @@ export default async function handler(req, res) {
     }
 
     try {
-        const dataBarang = await db.select().table("barang").orderBy("id", "desc");
+        const dataBarang = await db
+            .select('barang.id', 'barang.kode', 'barang.nama', 'barang.harga_beli', 'barang.harga_jual_terbaru', 'barang.jumlah', 'barang.kategori', 'barang.pembelian_id', 'barang.tanggal_perubahan', db.raw('SUM(same_code_barang.jumlah) as total_jumlah'))
+            .from('barang')
+            .leftJoin('barang as same_code_barang', 'barang.kode', 'same_code_barang.kode')
+            .groupBy('barang.id', 'barang.kode', 'barang.nama', 'barang.harga_beli', 'barang.harga_jual_terbaru', 'barang.jumlah', 'barang.kategori', 'barang.pembelian_id', 'barang.tanggal_perubahan')
+            .orderBy('barang.tanggal_perubahan', 'asc'); // Urutkan berdasarkan kolom 'tanggal_perubahan'
+
         return res.status(200).json({
             data: dataBarang
         });

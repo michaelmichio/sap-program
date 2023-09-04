@@ -11,6 +11,7 @@ import {
   fetchCreateInvoicePenjualan,
   fetchCreatePenjualanByInvoiceId,
   fetchDeleteInvoicePenjualanById,
+  fetchDeletePenjualanById,
   fetchPenjualanDataByInvoiceId,
   formatISODate
 } from "@/utils/helpers";
@@ -104,6 +105,10 @@ export default function Penjualan(props) {
   const [showDeleteInvoiceModal, setShowDeleteInvoiceModal] = useState(false);
   const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
 
+  // DELETE PENJUALAN
+  const [showDeletePenjualanModal, setShowDeletePenjualanModal] = useState(false);
+  const [deletePenjualanId, setDeletePenjualanId] = useState(null);
+
   // POP UP
   const [popupMessage, setPopupMesage] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -188,8 +193,10 @@ export default function Penjualan(props) {
           kode_barang: barang.kode,
           nama_barang: barang.nama,
           kategori: barang.kategori,
+          jumlah: barang.jumlah,
           harga_beli: barang.harga_beli,
           harga_jual: barang.harga_jual_terbaru,
+          total_jumlah: barang.total_jumlah,
         }));
         setDataBarang(options);
         setLoading(false);
@@ -416,6 +423,36 @@ export default function Penjualan(props) {
     } finally {
       setShowDeleteInvoiceModal(false); // Close the delete modal
       setDeleteInvoiceId(null); // Reset the invoice ID to be deleted
+    }
+  };
+
+  // DELETE PENJUALAN BY ID
+  const openDeletePenjualanModal = (penjualanId) => {
+    setDeletePenjualanId(penjualanId); // Set the penjualan ID to be deleted
+    setShowDeletePenjualanModal(true); // Show the delete modal
+  };
+
+  const closeDeletePenjualanModal = () => {
+    setShowDeletePenjualanModal(false);
+  };
+
+  const confirmDeletePenjualan = async (e) => {
+    e.preventDefault();
+
+    try {
+      await fetchDeletePenjualanById(token, deletePenjualanId);
+      setFetchNewPenjualanData(true);
+
+      setPopupMesage("Penjualan berhasil dihapus.");
+      setShowSuccessPopup(true);
+    } catch (error) {
+      console.error("Error deleting penjualan:", error.message);
+
+      setPopupMesage("Penjualan gagal dihapus.");
+      setShowErrorPopup(true);
+    } finally {
+      setShowDeletePenjualanModal(false); // Close the delete modal
+      setDeletePenjualanId(null); // Reset the penjualan ID to be deleted
     }
   };
 
@@ -725,14 +762,12 @@ export default function Penjualan(props) {
       )}
 
       {showAddPenjualanModal && (
-
-        <div class="z-50 fixed top-0 left-0 w-full h-full outline-none overflow-x-hidden overflow-y-auto">
+        <div className="z-50 fixed top-0 left-0 w-full h-full outline-none overflow-x-hidden overflow-y-auto">
           <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50" />
-          <div class="sm:h-[calc(100%-3rem)] mx-auto w-9/12 md:w-9/12 my-6 relative w-auto pointer-events-none">
-            <div class="max-h-full overflow-hidden border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-
-              <div class="flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-300 rounded-t-md">
-                <h5 class="text-xl font-medium leading-normal text-gray-800">
+          <div className="sm:h-[calc(100%-3rem)] mx-auto w-9/12 md:w-9/12 my-6 relative w-auto pointer-events-none">
+            <div className="h-full max-h-full overflow-hidden border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+              <div className="flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-300 rounded-t-md">
+                <h5 className="text-xl font-medium leading-normal text-gray-800">
                   Invoice Penjualan
                 </h5>
                 <div className="flex justify-between items-center">
@@ -759,9 +794,7 @@ export default function Penjualan(props) {
                   </button>
                 </div>
               </div>
-
-              <div class="flex-auto overflow-y-auto relative">
-
+              <div className="flex-auto overflow-y-auto relative">
                 <div className="flex flex-wrap justify-between p-2">
                   <div className="w-full lg:w-2/12 px-2">
                     <div className="relative w-full">
@@ -824,13 +857,64 @@ export default function Penjualan(props) {
                     </div>
                   </div>
                 </div>
-
                 <hr className="border-b-1 border-gray-300" />
-
+                <div className="flex flex-wrap justify-between p-2 text-sm">
+                  <div className="w-full lg:w-2/12 px-2">
+                    <div className="relative w-full">
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        Jenis Kendaraan
+                      </label>
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        {selectedInvoiceData.jenis_kendaraan || "-"}
+                      </label>
+                    </div>
+                  </div>
+                  <div className="w-full lg:w-2/12 px-2">
+                    <div className="relative w-full">
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        Nomor Polisi
+                      </label>
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        {selectedInvoiceData.nomor_polisi || "-"}
+                      </label>
+                    </div>
+                  </div>
+                  <div className="w-full lg:w-2/12 px-2">
+                    <div className="relative w-full">
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        Nomor Mesin
+                      </label>
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        {selectedInvoiceData.nomor_mesin || "-"}
+                      </label>
+                    </div>
+                  </div>
+                  <div className="w-full lg:w-2/12 px-2">
+                    <div className="relative w-full">
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        Nomor Rangka
+                      </label>
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        {selectedInvoiceData.nomor_rangka || "-"}
+                      </label>
+                    </div>
+                  </div>
+                  <div className="w-full lg:w-2/12 px-2">
+                    <div className="relative w-full">
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        Nomor SPK
+                      </label>
+                      <label className="block uppercase text-gray-600 font-bold" >
+                        {selectedInvoiceData.nomor_spk || "-"}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <hr className="border-b-1 border-gray-300" />
                 {selectedInvoiceData.status === "pending" && (
-                  <form onSubmit={handlePenjualanSubmit} className="flex flex-wrap px-4">
-                    <div className="w-full lg:w-6/12 pr-2">
-                      <div className="relative w-full">
+                  <form onSubmit={handlePenjualanSubmit} className="flex flex-wrap px-4 pt-1">
+                    <div className="w-full lg:w-12/12 pr-2">
+                      <div className="relative w-full lg:w-6/12">
                         <label className="block uppercase text-gray-600 text-sm font-bold" >
                           Nama Barang:
                         </label>
@@ -846,7 +930,22 @@ export default function Penjualan(props) {
                         />
                       </div>
                     </div>
-                    <div className="w-full lg:w-2/12 pr-2">
+                    <div className="w-full lg:w-3/12 pr-2">
+                      <div className="relative w-full">
+                        <label className="block uppercase text-gray-600 text-sm font-bold" >
+                          Harga Beli:
+                        </label>
+                        <input
+                          disabled
+                          defaultValue={selectedBarang?.harga_beli}
+                          // onChange={handleInputPenjualanChange}
+                          required name="harga_beli"
+                          type="number"
+                          className="mt-1 p-1 bg-gray-200 border border-gray-300 rounded w-full"
+                        />
+                      </div>
+                    </div>
+                    <div className="w-full lg:w-3/12 pr-2">
                       <div className="relative w-full">
                         <label className="block uppercase text-gray-600 text-sm font-bold" >
                           Harga Jual:
@@ -861,22 +960,23 @@ export default function Penjualan(props) {
                         />
                       </div>
                     </div>
-                    <div className="w-full lg:w-1/12 pr-2">
+                    <div className="w-full lg:w-2/12 pr-2">
                       <div className="relative w-full">
                         <label className="block uppercase text-gray-600 text-sm font-bold">
-                          Jumlah:
+                          Jumlah {selectedBarang && <span className={selectedBarang.jumlah > 0 ? "text-sky-800 text-xs" : "text-red-500 text-xs"}>{"(Stok " + selectedBarang.jumlah + " pcs)"}</span>}:
                         </label>
                         <input
                           value={newPenjualanData.jumlah}
                           onChange={handleInputPenjualanChange}
                           required
                           name="jumlah"
+                          min={0}
                           type="number" // Menggunakan tipe number
                           className="mt-1 p-1 border border-gray-300 rounded w-full"
                         />
                       </div>
                     </div>
-                    <div className="w-full lg:w-2/12 pr-2">
+                    <div className="w-full lg:w-3/12 pr-2">
                       <div className="relative w-full">
                         <label className="block uppercase text-gray-600 text-sm font-bold" >
                           Jumlah Harga:
@@ -905,9 +1005,7 @@ export default function Penjualan(props) {
                     </div>
                   </form>
                 )}
-
-                <div class="flex-auto overflow-y-auto relative p-4">
-
+                <div className="flex-auto overflow-y-auto relative p-4">
                   <div className="w-full overflow-hidden rounded-lg shadow-xs">
                     <div className="w-full overflow-x-auto overflow-y-auto">
                       <table className="w-full">
@@ -956,12 +1054,10 @@ export default function Penjualan(props) {
                       </table>
                     </div>
                   </div>
-
+                  <hr className="border-b-1 border-gray-300" />
                 </div>
-
                 {/* <hr className="my-2 border-b-1 border-gray-300" /> */}
-
-                <div className="flex flex-wrap justify-end">
+                {/* <div className="flex flex-wrap justify-end">
                   <div className="w-full lg:w-2/12 px-4">
                     <div className="relative w-full">
                       <label className="block uppercase text-gray-600 text-md font-bold" >
@@ -976,15 +1072,24 @@ export default function Penjualan(props) {
                       </label>
                     </div>
                   </div>
-                </div>
-
+                </div> */}
               </div>
-
-              <div class="flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
+              <div className="flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
                 {selectedInvoiceData.status === "pending" && (
                   <>
-                    <hr className="my-2 border-b-1 border-gray-300" />
                     <div className="flex w-full justify-end">
+                      <div className="flex flex-wrap w-2/12 text-end px-6">
+                        <div className="w-full">
+                          <label className="block uppercase text-gray-600 text-md font-bold" >
+                            Harga Total
+                          </label>
+                        </div>
+                        <div className="w-full">
+                          <label className="block uppercase text-gray-600 text-md font-bold" >
+                            {currentFilteredItems[invoiceIndex].total_sales || "-"}
+                          </label>
+                        </div>
+                      </div>
                       <button
                         type="button"
                         className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"
@@ -996,11 +1101,9 @@ export default function Penjualan(props) {
                   </>
                 )}
               </div>
-
             </div>
           </div>
         </div>
-
       )}
 
       {/* {showEditInvoiceModal && (
@@ -1100,53 +1203,53 @@ export default function Penjualan(props) {
         </div>
       )}
 
-      {/* {showDeletePembelianModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
-                    <div className="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
-                        <div className="modal-content py-4 text-left px-6">
-                            <div className="flex justify-between items-center pb-3">
-                                <p className="text-2xl font-bold">Hapus Barang</p>
-                                <button
-                                    className="modal-close text-gray-500 hover:text-gray-700"
-                                    onClick={closeDeletePembelianModal}
-                                >
-                                    <svg
-                                        className="fill-current"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="18"
-                                        height="18"
-                                        viewBox="0 0 18 18"
-                                    >
-                                        <path
-                                            d="M1 1l16 16m0-16L1 17"
-                                            stroke="#808080"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menghapus barang ini?</p>
-                            <div className="mt-12">
-                                <button
-                                    className="bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white font-semibold rounded py-2 px-4"
-                                    onClick={confirmDeletePembelian}
-                                >
-                                    HAPUS
-                                </button>
-                                <button
-                                    className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
-                                    onClick={closeDeletePembelianModal}
-                                >
-                                    BATAL
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )} */}
+      {showDeletePenjualanModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
+          <div className="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+            <div className="modal-content py-4 text-left px-6">
+              <div className="flex justify-between items-center pb-3">
+                <p className="text-2xl font-bold">Hapus Barang</p>
+                <button
+                  className="modal-close text-gray-500 hover:text-gray-700"
+                  onClick={closeDeletePenjualanModal}
+                >
+                  <svg
+                    className="fill-current"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 18 18"
+                  >
+                    <path
+                      d="M1 1l16 16m0-16L1 17"
+                      stroke="#808080"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menghapus barang ini?</p>
+              <div className="mt-12">
+                <button
+                  className="bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white font-semibold rounded py-2 px-4"
+                  onClick={confirmDeletePenjualan}
+                >
+                  HAPUS
+                </button>
+                <button
+                  className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
+                  onClick={closeDeletePenjualanModal}
+                >
+                  BATAL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
 

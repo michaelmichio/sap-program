@@ -452,3 +452,23 @@ export const fetchCreatePenjualanByInvoiceId = async (token, newPenjualanData) =
         console.error("Error during penjualan by invoice registration:", error.message);
     }
 };
+
+// DELETE PENJUALAN BY ID
+export const fetchDeletePenjualanById = async (token, penjualanId) => {
+    try {
+        const response = await fetch(`/api/penjualan/deletePenjualan/${penjualanId}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during penjualan deletion: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during penjualan deletion:", error.message);
+    }
+};
