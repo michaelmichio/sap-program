@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getCookies } from "cookies-next";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import { fetchAllInvoicePembelianData, fetchCreateInvoicePembelian, fetchCreatePembelianByInvoiceId, fetchDeleteInvoiceById, fetchDeletePembelianById, fetchEditInvoiceById, fetchPembelianDataByInvoiceId, formatISODate } from "@/utils/helpers";
+import { fetchAllInvoicePembelianData, fetchCreateInvoicePembelian, fetchCreatePembelianByInvoiceId, fetchDeleteInvoicePembelianById, fetchDeletePembelianById, fetchEditInvoicePembelianById, fetchPembelianDataByInvoiceId, formatISODate } from "@/utils/helpers";
 
 export const getServerSideProps = async (context) => {
     const cookies = getCookies(context);
@@ -239,7 +239,7 @@ export default function Pembelian(props) {
         e.preventDefault();
 
         try {
-            await fetchEditInvoiceById(token, editInvoiceId);
+            await fetchEditInvoicePembelianById(token, editInvoiceId);
             setFetchNewInvoiceData(true);
             closeAddPembelianModal();
             closeEditInvoiceModal();
@@ -268,7 +268,7 @@ export default function Pembelian(props) {
         e.preventDefault();
 
         try {
-            await fetchDeleteInvoiceById(token, deleteInvoiceId);
+            await fetchDeleteInvoicePembelianById(token, deleteInvoiceId);
             setFetchNewInvoiceData(true);
 
             setPopupMesage("Invoice berhasil dihapus.");

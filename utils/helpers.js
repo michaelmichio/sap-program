@@ -287,8 +287,8 @@ export const fetchCreatePembelianByInvoiceId = async (token, newPembelianData) =
     }
 };
 
-// EDIT INVOICE BY ID
-export const fetchEditInvoiceById = async (token, invoiceId) => {
+// EDIT INVOICE PEMBELIAN BY ID
+export const fetchEditInvoicePembelianById = async (token, invoiceId) => {
     try {
         const response = await fetch(`/api/pembelian/updateInvoice/${invoiceId}`, {
             method: "PUT",
@@ -309,8 +309,8 @@ export const fetchEditInvoiceById = async (token, invoiceId) => {
     }
 };
 
-// DELETE INVOICE BY ID
-export const fetchDeleteInvoiceById = async (token, invoiceId) => {
+// DELETE INVOICE PEMBELIAN BY ID
+export const fetchDeleteInvoicePembelianById = async (token, invoiceId) => {
     try {
         const response = await fetch(`/api/pembelian/deleteInvoice/${invoiceId}`, {
             method: "DELETE",
@@ -390,3 +390,65 @@ export const fetchCreateInvoicePenjualan = async (token, newInvoiceData) => {
         console.error("Error during invoice registration:", error.message);
     }
 }
+
+// DELETE INVOICE PENJUALAN BY ID
+export const fetchDeleteInvoicePenjualanById = async (token, invoiceId) => {
+    try {
+        const response = await fetch(`/api/penjualan/deleteInvoice/${invoiceId}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during invoice deletion: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during invoice deletion:", error.message);
+    }
+};
+
+// READ ALL PENJUALAN BY INVOICE ID
+export const fetchPenjualanDataByInvoiceId = async (token, invoiceId) => {
+    try {
+        const response = await fetch(`/api/penjualan/${invoiceId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch penjualan data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw new Error(`Error fetching penjualan data: ${error.message}`);
+    }
+};
+
+// CREATE PENJUALAN BY INVOICE ID
+export const fetchCreatePenjualanByInvoiceId = async (token, newPenjualanData) => {
+    try {
+        const response = await fetch("/api/penjualan/createPenjualan", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newPenjualanData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during penjualan by invoice registration: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during penjualan by invoice registration:", error.message);
+    }
+};

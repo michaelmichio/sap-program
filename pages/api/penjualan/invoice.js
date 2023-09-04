@@ -30,7 +30,8 @@ export default async function handler(req, res) {
                 db.raw("(SELECT SUM(sales) FROM penjualan WHERE penjualan.invoice_penjualan_id = invoice_penjualan.id) as total_sales")
             )
             .leftJoin("customers", "invoice_penjualan.id_customer", "customers.id")
-            .leftJoin("users", "invoice_penjualan.id_user", "users.id");
+            .leftJoin("users", "invoice_penjualan.id_user", "users.id")
+            .orderBy("invoice_penjualan.id", "desc"); // Mengurutkan berdasarkan ID pesanan secara menurun
 
         return res.status(200).json(invoices);
     } catch (error) {
