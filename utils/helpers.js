@@ -472,3 +472,25 @@ export const fetchDeletePenjualanById = async (token, penjualanId) => {
         console.error("Error during penjualan deletion:", error.message);
     }
 };
+
+// EDIT INVOICE PENJUALAN BY ID
+export const fetchEditInvoicePenjualanById = async (token, invoiceId) => {
+    try {
+        const response = await fetch(`/api/penjualan/updateInvoice/${invoiceId}`, {
+            method: "PUT",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error during invoice edit: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Error during invoice edit:", error.message);
+    }
+};

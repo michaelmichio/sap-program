@@ -305,7 +305,7 @@ export default function Stok(props) {
                                                 <td className="uppercase w-1/6 truncate ... px-4 text-sm">{barang.kode || "-"}</td>
                                                 <td className="uppercase w-1/6 truncate ... px-4 text-sm">{barang.nama || "-"}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{barang.harga_beli || "-"}</td>
-                                                <td className="w-1/6 truncate ... px-4 text-sm">{barang.jumlah || "-"}</td>
+                                                <td className="w-1/6 truncate ... px-4 text-sm">{barang.jumlah || 0}</td>
                                                 <td className="w-1/6 truncate ... px-4 text-sm">{barang.harga_jual_terbaru || "-"}</td>
                                                 <td className="px-4 text-sm flex justify-end">
                                                     <button

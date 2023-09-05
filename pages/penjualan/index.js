@@ -12,6 +12,7 @@ import {
   fetchCreatePenjualanByInvoiceId,
   fetchDeleteInvoicePenjualanById,
   fetchDeletePenjualanById,
+  fetchEditInvoicePenjualanById,
   fetchPenjualanDataByInvoiceId,
   formatISODate
 } from "@/utils/helpers";
@@ -100,6 +101,10 @@ export default function Penjualan(props) {
     sales: "",
     invoice_penjualan_id: "",
   });
+
+  // UPDATE INVOICE
+  const [showEditInvoiceModal, setShowEditInvoiceModal] = useState(false);
+  const [editInvoiceId, setEditInvoiceId] = useState(null);
 
   // DELETE INVOICE
   const [showDeleteInvoiceModal, setShowDeleteInvoiceModal] = useState(false);
@@ -393,6 +398,36 @@ export default function Penjualan(props) {
       setFetchNewInvoiceData(true);
     } catch (error) {
       console.error("Error creating invoice:", error.message);
+    }
+  };
+
+  // UPDATE INVOICE FOR SUBMIT
+  const openEditInvoiceModal = (invoiceId) => {
+    setEditInvoiceId(invoiceId);
+    setShowEditInvoiceModal(true);
+  };
+
+  const closeEditInvoiceModal = () => {
+    setShowEditInvoiceModal(false);
+    setEditInvoiceId(null);
+  };
+
+  const confirmEditInvoice = async (e) => {
+    e.preventDefault();
+
+    try {
+      await fetchEditInvoicePenjualanById(token, editInvoiceId);
+      setFetchNewInvoiceData(true);
+      closeAddPenjualanModal();
+      closeEditInvoiceModal();
+
+      setPopupMesage("Invoice berhasil diubah.");
+      setShowSuccessPopup(true);
+    } catch (error) {
+      console.error("Error editing invoice:", error.message);
+
+      setPopupMesage("Invoice gagal diubah.");
+      setShowErrorPopup(true);
     }
   };
 
@@ -1106,54 +1141,54 @@ export default function Penjualan(props) {
         </div>
       )}
 
-      {/* {showEditInvoiceModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
-                    <div className="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
-                        <div className="modal-content py-4 text-left px-6">
-                            <div className="flex justify-between items-center pb-3">
-                                <p className="text-2xl font-bold">Selesaikan Invoice</p>
-                                <button
-                                    className="modal-close text-gray-500 hover:text-gray-700"
-                                    onClick={closeEditInvoiceModal}
-                                >
-                                    <svg
-                                        className="fill-current"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="18"
-                                        height="18"
-                                        viewBox="0 0 18 18"
-                                    >
-                                        <path
-                                            d="M1 1l16 16m0-16L1 17"
-                                            stroke="#808080"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menyelesaikan invoice ini?</p>
-                            <p className="text-gray-700">Invoice yang sudah selesai tidak dapat diubah lagi.</p>
-                            <div className="mt-12">
-                                <button
-                                    className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"
-                                    onClick={confirmEditInvoice}
-                                >
-                                    SELESAI
-                                </button>
-                                <button
-                                    className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
-                                    onClick={closeEditInvoiceModal}
-                                >
-                                    BATAL
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )} */}
+      {showEditInvoiceModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
+          <div className="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+            <div className="modal-content py-4 text-left px-6">
+              <div className="flex justify-between items-center pb-3">
+                <p className="text-2xl font-bold">Selesaikan Invoice</p>
+                <button
+                  className="modal-close text-gray-500 hover:text-gray-700"
+                  onClick={closeEditInvoiceModal}
+                >
+                  <svg
+                    className="fill-current"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 18 18"
+                  >
+                    <path
+                      d="M1 1l16 16m0-16L1 17"
+                      stroke="#808080"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menyelesaikan invoice ini?</p>
+              <p className="text-gray-700">Invoice yang sudah selesai tidak dapat diubah lagi.</p>
+              <div className="mt-12">
+                <button
+                  className="bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded"
+                  onClick={confirmEditInvoice}
+                >
+                  SELESAI
+                </button>
+                <button
+                  className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
+                  onClick={closeEditInvoiceModal}
+                >
+                  BATAL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showDeleteInvoiceModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
