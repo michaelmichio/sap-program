@@ -413,15 +413,13 @@ export default function Pembelian(props) {
                                                     >
                                                         {invoice.status === "pending" ? "INPUT" : "LIHAT"}
                                                     </button>
-                                                    {invoice.status === "pending" && (
-                                                        <button
-                                                            type="button"
-                                                            className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
-                                                            onClick={() => openDeleteInvoiceModal(invoice.id)}
-                                                        >
-                                                            HAPUS
-                                                        </button>
-                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        className="ml-2 text-gray-500 hover:text-gray-700 font-semibold py-2 px-4"
+                                                        onClick={() => openDeleteInvoiceModal(invoice.id)}
+                                                    >
+                                                        HAPUS
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))
@@ -926,7 +924,7 @@ export default function Pembelian(props) {
             {showDeleteInvoiceModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
-                    <div className="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                    <div className="modal-container bg-white w-11/12 md:max-w-lg mx-auto rounded shadow-lg z-50 overflow-y-auto">
                         <div className="modal-content py-4 text-left px-6">
                             <div className="flex justify-between items-center pb-3">
                                 <p className="text-2xl font-bold">Hapus Invoice</p>
@@ -952,6 +950,9 @@ export default function Pembelian(props) {
                                 </button>
                             </div>
                             <p className="text-gray-700 mt-8">Apakah Anda yakin ingin menghapus invoice ini?</p>
+                            <p className="text-blue-500 mt-8 text-sm">
+                                Jumlah stok barang akan dikembalikan secara otomatis untuk invoice dengan status "PENDING", dan perlu dilakukan secara manual untuk invoice dengan status "SELESAI".
+                            </p>
                             <div className="mt-12">
                                 <button
                                     className="bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white font-semibold rounded py-2 px-4"
